@@ -1,12 +1,20 @@
 # import
 from typing import Tuple
 import numpy as np
+import random
 
 # parameter
 state_size = (3,3)
 reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
 
 # class tictactoe environment
+'''
+- player를 전환한 후에 state를 판단
+- 따라서 lose가 없고 win, draw만 판단
+- reward는 player=True 기준으로 제공
+
+- step 외부에서 state를 판단해도 같은 결과를 얻을 수 있음
+'''
 class Environment:
     def __init__(self, state_size:Tuple, reward_dict:dict):
         # env size
@@ -16,6 +24,7 @@ class Environment:
 
         # state, action
         self.present_state = np.zeros((2, self.n, self.n)) # present_state[0]: state for first player
+        self.board = self.present_state[0] + self.present_state[1] # game board
         self.action_space = np.arange(self.num_actions) # [0, 1, ..., 8] : action idx
 
         # reward, done
@@ -33,15 +42,15 @@ class Environment:
         '''
         x, y = divmod(action_idx, self.n)
 
-        self.present_state[0][x, y] = -1
-        next_state = self.present_state
+        self.change_player() # change turn
+        self.present_state[1][x, y] = -1
+        self.board[x, y] = -1
 
         # 게임 종료 및 승자 확인
+        next_state = self.present_state
         done, is_win = self.is_done(next_state)
         reward = self.check_reward(is_win)
-
         self.done = done
-        self.change_player() # change turn
         
         return next_state ,reward, done, is_win
 
@@ -51,6 +60,7 @@ class Environment:
         game reset
         '''
         self.present_state = np.zeros((2, self.n, self.n))
+        self.board = self.present_state[0] + self.present_state[1]
         self.done = False
         self.player = True
 
@@ -73,12 +83,12 @@ class Environment:
         print("-"*10)
         
 
-    def check_legal_action(self, state):
+    def check_legal_action(self, board):
         '''
-        state에서 가능한 action array를 원핫으로 출력
+        board에서 가능한 action array를 원핫으로 출력
         '''
-        state = state[0].reshape(-1)
-        legal_actions = np.array(list(map(lambda x: state[x] == 0, self.action_space)))
+        board = board.reshape(-1)
+        legal_actions = np.array(list(map(lambda x: board[x] == 0, self.action_space)), dtype=int)
         return legal_actions
 
 
@@ -88,7 +98,7 @@ class Environment:
         is_win: True - win / False - draw
         '''
         is_done, is_win = False, False
-        player_state = state[0]
+        player_state = state[1]
 
         # 무승부 여부 확인
         if state.sum() == -9:
@@ -117,10 +127,21 @@ class Environment:
         reward를 주는 함수
         draw, progress: 0 
         first player 기준 reward 제공
+        player를 돌린 후 reward를 제공하는 것 고려
         '''
         reward = 0
 
         if is_win:
-            reward = self.reward_dict["win"] if self.player else self.reward_dict["lose"]
+            reward = self.reward_dict["lose"] if self.player else self.reward_dict["win"]
 
         return reward
+
+    def choose_random_action(self, board):
+        '''
+        가능한 action 중에서 random으로 action을 선택한다.
+        '''
+        legal_actions = self.check_legal_action(board)
+        legal_action_idxs = np.where(legal_actions != 0)[0]
+        action = np.random.choice(legal_action_idxs)
+
+        return action
