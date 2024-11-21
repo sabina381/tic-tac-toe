@@ -1,0 +1,1 @@
+# network train하는 함수 구현

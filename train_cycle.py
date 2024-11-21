@@ -1,0 +1,1 @@
+# network train하는 cycle 함수 (main에 합치는 것도 나쁘지 않다고 생각함. 고민)
