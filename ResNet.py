@@ -3,8 +3,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 # parameter
-state_size = (2, 3, 3) # env.state_size
+state_size = (3, 3) # env.state_size
 action_size = 9 # env.action_size
+
 CONV_UNITS = 64
 RESIDUAL_NUM = 16
 BATCHSIZE = 64
