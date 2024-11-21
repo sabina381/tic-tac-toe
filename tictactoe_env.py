@@ -24,7 +24,6 @@ class Environment:
 
         # state, action
         self.present_state = np.zeros((2, self.n, self.n)) # present_state[0]: state for first player
-        self.board = self.present_state[0] + self.present_state[1] # game board
         self.action_space = np.arange(self.num_actions) # [0, 1, ..., 8] : action idx
 
         # reward, done
@@ -44,7 +43,6 @@ class Environment:
 
         self.change_player() # change turn
         self.present_state[1][x, y] = -1
-        self.board[x, y] = -1
 
         # 게임 종료 및 승자 확인
         next_state = self.present_state
@@ -60,7 +58,6 @@ class Environment:
         game reset
         '''
         self.present_state = np.zeros((2, self.n, self.n))
-        self.board = self.present_state[0] + self.present_state[1]
         self.done = False
         self.player = True
 
@@ -71,7 +68,7 @@ class Environment:
         '''
         state = state if self.player else state[[1, 0]]
         state = state.reshape(2, -1)
-        board = state[0] - state[1]
+        board = state[0] - state[1] # -1: player / 1: enemy
         check_board = np.array(list(map(lambda x: 'X' if board[x] == -1 else 'O' if board[x] == 1 else '.', self.action_space)))
 
         # string으로 변환하고 game board 형태로 출력
@@ -82,11 +79,12 @@ class Environment:
         print("-"*10)
         
 
-    def check_legal_action(self, board):
+    def check_legal_action(self, state):
         '''
         board에서 가능한 action array를 원핫으로 출력
         '''
-        board = board.reshape(-1)
+        state = state.reshape(2,-1)
+        board = state[0]+state[1]
         legal_actions = np.array(list(map(lambda x: board[x] == 0, self.action_space)), dtype=int)
         return legal_actions
 
@@ -135,11 +133,11 @@ class Environment:
 
         return reward
 
-    def choose_random_action(self, board):
+    def choose_random_action(self, state):
         '''
         가능한 action 중에서 random으로 action을 선택한다.
         '''
-        legal_actions = self.check_legal_action(board)
+        legal_actions = self.check_legal_action(state)
         legal_action_idxs = np.where(legal_actions != 0)[0]
         action = np.random.choice(legal_action_idxs)
 
