@@ -14,6 +14,7 @@ BATCHSIZE = 64
 차원 오류 해결
 But 제대로 되는지 모르겠음
 '''
+# Residual block
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels):
         super().__init__()
@@ -33,7 +34,7 @@ class ResidualBlock(nn.Module):
         x = F.relu(x)
         return x
 
-
+# main Net
 class Net(nn.Module):
     def __init__(self, state_size, action_size, conv_units):
         super().__init__()
