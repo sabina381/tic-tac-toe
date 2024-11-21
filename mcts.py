@@ -3,15 +3,18 @@ import copy
 import numpy as np
 
 from tictactoe_env import Environment
+from ResNet import ResidualBlock, Net
 
 # parameter
+C_PUCT = 1.0
+EVAL_CNT = 50
+
 state_size = (3,3)
 reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
 env = Environment(state_size, reward_dict)
 
-C_PUCT = 1.0
-EVAL_CNT = 50
 
+# define Mcts class
 class Mcts:
     def __init__(self, env, model, state, temperature):
         self.env = copy.deepcopy(env)
@@ -106,7 +109,7 @@ class Mcts:
         for _ in range(EVAL_CNT):
             root_node.evaluate()
 
-        scores = list(map(lambda c: c.n, root_node.child_nodes))
+        scores = [c.n for c in root_node.child_nodes]
         if self.temperature == 0: # 최대값인 경우에만 1로 지정
             action = np.argmax(scores)
             scores = np.zeros(len(scores))
@@ -130,7 +133,7 @@ class Mcts:
         '''
         MCTS를 통해 얻은 policy에 따른 action 선택
         '''
-        scores = self.get_policy()
-        action = np.random.choice(self.legal_actions, p=scores)
-        return action
+        policy = self.get_policy()
+        action = np.random.choice(self.legal_actions, p=policy)
+        return policy, action
 
