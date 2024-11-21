@@ -19,7 +19,7 @@ model = Net(state_size, env.num_actions, CONV_UNITS)
 mcts = Mcts(env, model, env.present_state, temperature = 1)
 
 
-# self play
+# self play 함수
 def self_play(model, num_games):
     data = []
 
@@ -36,7 +36,7 @@ def self_play(model, num_games):
             episode_history.append((state, policy))
 
         result = reward
-        
+
         episode_history = [(x[0], x[1], reward) for x in episode_history]
         data.extend(episode_history)
 
