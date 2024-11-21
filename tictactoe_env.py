@@ -69,7 +69,7 @@ class Environment:
         state = state if self.player else state[[1, 0]]
         state = state.reshape(2, -1)
         board = state[0] - state[1] # -1: player / 1: enemy
-        check_board = np.array(list(map(lambda x: 'X' if board[x] == -1 else 'O' if board[x] == 1 else '.', self.action_space)))
+        check_board = list(map(lambda x: 'X' if board[x] == -1 else 'O' if board[x] == 1 else '.', self.action_space))
 
         # string으로 변환하고 game board 형태로 출력
         board_string = ' '.join(check_board)
@@ -85,7 +85,7 @@ class Environment:
         '''
         state = state.reshape(2,-1)
         board = state[0]+state[1]
-        legal_actions = np.array(list(map(lambda x: board[x] == 0, self.action_space)), dtype=int)
+        legal_actions = np.array([board[x] == 0 for x in self.action_space], dtype = int)
         return legal_actions
 
 
