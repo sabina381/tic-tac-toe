@@ -71,13 +71,12 @@ class Environment:
         '''
         state = state if self.player else state[[1, 0]]
         state = state.reshape(2, -1)
-        check_state_1 = np.array(list(map(lambda x: 'X' if state[0][x] != 0 else '.', self.action_space)))
-        check_state_2 = np.array(list(map(lambda x: 'O' if state[1][x] != 0 else '.', self.action_space)))
-        combined_array = np.array([check_state_1[i] if check_state_1[i] != '.' else check_state_2[i] for i in self.action_space])
+        board = state[0] - state[1]
+        check_board = np.array(list(map(lambda x: 'X' if board[x] == -1 else 'O' if board[x] == 1 else '.', self.action_space)))
 
         # string으로 변환하고 game board 형태로 출력
-        combined_string = ' '.join(combined_array)
-        formatted_string = '\n'.join([combined_string[i:i+6] for i in range(0, len(combined_string), 6)])
+        board_string = ' '.join(check_board)
+        formatted_string = '\n'.join([board_string[i:i+6] for i in range(0, len(board_string), 6)])
 
         print(formatted_string)
         print("-"*10)
