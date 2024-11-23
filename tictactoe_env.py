@@ -46,7 +46,7 @@ class Environment:
 
         # 게임 종료 및 승자 확인
         next_state = self.present_state
-        done, is_win = self.is_done(next_state)
+        done, is_win = self.is_done(next_state[1])
         reward = self.check_reward(is_win)
         self.done = done
         
@@ -95,14 +95,13 @@ class Environment:
         is_win: True - win / False - draw
         '''
         is_done, is_win = False, False
-        player_state = state[1]
 
         # 무승부 여부 확인
         if state.sum() == -9:
-            is_done = True, False
+            is_done, is_win = True, False
 
         # 승리 조건 확인
-        axis_diag_sum = np.concatenate([player_state.sum(axis=0), player_state.sum(axis=1), [player_state.trace()], [np.fliplr(player_state).trace()]]) # (8, )
+        axis_diag_sum = np.concatenate([state.sum(axis=0), state.sum(axis=1), [state.trace()], [np.fliplr(state).trace()]]) # (8, )
         if -3 in axis_diag_sum:
             is_done, is_win = True, True
 
