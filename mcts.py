@@ -101,11 +101,11 @@ class Mcts:
 
     ########################
     # methods of Mcts
-    def get_policy(self):
+    def get_policy(self, state):
         '''
         MCTS에 따라 policy 계산
         '''
-        root_node = self.Node(self, self.state, 0) # Mcts 객체 self 전달
+        root_node = self.Node(self, state, 0) # Mcts 객체 self 전달
 
         for _ in range(EVAL_CNT):
             root_node.evaluate()
@@ -130,11 +130,11 @@ class Mcts:
         return [x/sum(xs) for x in xs]
 
 
-    def get_action(self):
+    def get_action(self, state):
         '''
         MCTS를 통해 얻은 policy에 따른 action 선택
         '''
-        policy = self.get_policy()
+        policy = self.get_policy(state)
         action = np.random.choice(self.legal_actions, p=policy)
         return policy, action
 
