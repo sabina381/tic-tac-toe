@@ -5,7 +5,6 @@ import random
 
 # parameter
 state_size = (3,3)
-reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
 
 # class tictactoe environment
 '''
@@ -16,7 +15,7 @@ reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
 - step 외부에서 state를 판단해도 같은 결과를 얻을 수 있음
 '''
 class Environment:
-    def __init__(self, state_size:Tuple, reward_dict:dict):
+    def __init__(self, state_size:Tuple):
         # env size
         self.state_size = state_size # (3, 3)
         self.n = self.state_size[0] # 3
@@ -27,7 +26,7 @@ class Environment:
         self.action_space = np.arange(self.num_actions) # [0, 1, ..., 8] : action idx
 
         # reward, done
-        self.reward_dict = reward_dict
+        self.reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
         self.done = False
         
         # 추가
