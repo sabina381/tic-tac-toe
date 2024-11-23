@@ -1,5 +1,6 @@
 # import
 import copy
+from math import sqrt
 import numpy as np
 
 from tictactoe_env import Environment
@@ -17,7 +18,7 @@ env = Environment(state_size, reward_dict)
 # define Mcts class
 class Mcts:
     def __init__(self, env, model, state, temperature):
-        self.env = copy.deepcopy(env)
+        self.env = env
         self.model = model
         self.state = state
         self.temperature = temperature
@@ -35,7 +36,7 @@ class Mcts:
                 self.child_nodes = None
 
             def evaluate(self):
-                is_done, is_win = self.mcts.env.is_done(self.state)
+                is_done, is_win = self.mcts.env.is_done(self.state[0])
 
                 # 게임 종료 시 승패에 따라 value 계산
                 if is_done:
@@ -58,6 +59,7 @@ class Mcts:
                     legal_actions = self.mcts.legal_actions
 
                     for action, policy in zip(legal_actions, policies):
+                        self.mcts.env.present_state = self.state
                         next_state, _, _, _ = self.mcts.env.step(action)
                         self.child_nodes.append(Node(self.mcts, next_state, policy))
 
