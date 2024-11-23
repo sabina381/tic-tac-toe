@@ -11,8 +11,7 @@ C_PUCT = 1.0
 EVAL_CNT = 50
 
 state_size = (3,3)
-reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
-env = Environment(state_size, reward_dict)
+env = Environment(state_size)
 
 
 # define Mcts class
