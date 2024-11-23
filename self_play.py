@@ -1,5 +1,6 @@
 # import
 import numpy as np
+import copy
 
 from tictactoe_env import Environment
 from ResNet import ResidualBlock, Net
@@ -17,8 +18,6 @@ env = Environment(state_size, reward_dict)
 CONV_UNITS = 64
 model = Net(state_size, env.num_actions, CONV_UNITS)
 
-# 내부에서 객체 만들어 사용 (한 번 행동을 선택할 때마다 시행해야 함)
-mcts = Mcts(env, model, env.present_state, temperature = 1)
 
 # 1번의 게임 play 함수
 def play_one_game(model):
@@ -31,9 +30,9 @@ def play_one_game(model):
         policy, action = mcts.get_action()
         _, reward, _, _ = env.step(action)
 
+        state[[0, 1]] = state[[1, 0]] if not env.player else state[[0, 1]] # player = True 기준, (player_state, enemy_state) 고정
         history.append((state, policy))
 
-    result = reward
     history = [(x[0], x[1], reward) for x in history]
 
     return history
@@ -41,10 +40,11 @@ def play_one_game(model):
 
 # self play 함수
 def self_play():
+    env = copy.deepcopy(env)
     data = []
 
     for i in range(SP_GAME_COUNT):
         history = play_one_game(model)
-        data.extend
+        data.extend(history)
 
     return data
