@@ -67,7 +67,9 @@ def train_network():
         loss.backward()
         optimizer.step()
 
-    # 최신 모델 저장
+    # 최근 모델 저장
+    with open(f'{file_name}_model_latest.pkl', 'wb') as f:
+        pickle.dump(model.state_dict(), f)
 
     # lr,... epoch,... 조절...
         
