@@ -1,11 +1,11 @@
-# import numpy as np
-# import random
-# import copy
+import numpy as np
+import random
+import copy
 
-# from Environment import Environment
+from Environment import Environment
 
-# # parameter
-# STATE_SIZE = (3, 3)
+# parameter
+STATE_SIZE = (3, 3)
 
 # State
 class State(Environment):
