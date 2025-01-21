@@ -1,7 +1,7 @@
-# import
-import pickle
+# # import
+# import pickle
 
-from ResNet import Net
+# from ResNet import Net
 
 # history 불러오는 함수
 def load_history(file):

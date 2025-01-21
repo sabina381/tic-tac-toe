@@ -1,38 +1,38 @@
-# import 
-import torch
-from torch import nn, optim
-import torch.nn.functional as F
-from torch.utils.data import Dataset, DataLoader, TensorDataset
-from torchvision import datasets, transforms
+# # import 
+# import torch
+# from torch import nn, optim
+# import torch.nn.functional as F
+# from torch.utils.data import Dataset, DataLoader, TensorDataset
+# from torchvision import datasets, transforms
 
-import numpy as np
-import pickle
-import random
+# import numpy as np
+# import pickle
+# import random
 
-from ResNet import Net
-from file_save_load import load_history, save_model, load_model
+# from ResNet import Net
+# from file_save_load import load_history, save_model, load_model
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+# import sys
+# import os
+# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
 
-from Environment import Environment
+# from Environment import Environment
 
-# parameter
-TRAIN_EPOCHS = 100  # 학습 횟수
-BATCHSIZE = 64
-LEARN_MAX = 0.001
+# # parameter
+# TRAIN_EPOCHS = 100  # 학습 횟수
+# BATCHSIZE = 64
+# LEARN_MAX = 0.001
 
-file_name = "model1"
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# file_name = "model1"
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-state_size = (3,3)
-env = Environment()
+# state_size = (3,3)
+# env = Environment()
 
-CONV_UNITS = 64
-model = Net(state_size, env.num_actions, CONV_UNITS).to(device)
+# CONV_UNITS = 64
+# model = Net(state_size, env.num_actions, CONV_UNITS).to(device)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=LEARN_MAX)
+# optimizer = torch.optim.Adam(model.parameters(), lr=LEARN_MAX)
 
 '''
 차원 수정, history 보고 물려야함

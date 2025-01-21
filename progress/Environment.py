@@ -1,7 +1,7 @@
-import numpy as np
-from State import State
+# import numpy as np
+# from State import State
 # parameter
-STATE_SIZE = (3, 3)
+# STATE_SIZE = (3, 3)
 
 # Environment class
 class Environment:

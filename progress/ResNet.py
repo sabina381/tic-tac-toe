@@ -1,19 +1,19 @@
-# import
-import torch.nn as nn
-import torch.nn.functional as F
+# # import
+# import torch.nn as nn
+# import torch.nn.functional as F
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+# import sys
+# import os
+# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
 
-from Environment import Environment
+# from Environment import Environment
 
-# parameter
-env = Environment()
+# # parameter
+# env = Environment()
 
-CONV_UNITS = 64
-RESIDUAL_NUM = 16
-BATCHSIZE = 64
+# CONV_UNITS = 64
+# RESIDUAL_NUM = 16
+# BATCHSIZE = 64
 
 # ResNet
 '''
