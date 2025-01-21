@@ -10,8 +10,7 @@ from evaluate_best_player import evaluate_best_player
 TRAIN_NUM = 10
 
 state_size = (3,3)
-reward_dict = {'win':1, 'lose':-1, 'draw':0, 'progress':0}
-env = Environment(state_size, reward_dict)
+env = Environment(state_size)
 
 CONV_UNITS = 64
 model = Net(state_size, env.num_actions, CONV_UNITS)
@@ -19,7 +18,7 @@ model = Net(state_size, env.num_actions, CONV_UNITS)
 
 # network train cycle
 for i in range(TRAIN_NUM):
-    self_play()
+    self_play(model)
     train_network()
     update_best_player = evaluate_network()
 

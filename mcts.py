@@ -26,16 +26,17 @@ class Mcts:
         # define Node class 
         class Node:
             def __init__(self, mcts, state, p):
-                self.mcts = mcts # Mcts 객체 참조 저장
+                self.mcts = copy.deepcopy(mcts) # Mcts 객체 참조 저장
+                self.env = copy.deepcopy(self.mcts.env)
 
-                self.state = state
+                self.state = copy.deepcopy(state)
                 self.p = p # policy
                 self.n = 0 # count
                 self.w = 0 # cumulate value
                 self.child_nodes = None
 
             def evaluate(self):
-                is_done, is_win = self.mcts.env.is_done(self.state[0])
+                is_done, is_win = self.env.is_done(self.state[0])
 
                 # 게임 종료 시 승패에 따라 value 계산
                 if is_done:
@@ -46,27 +47,31 @@ class Mcts:
                     return value
 
                 # child node가 없는 경우 => 확장
-                elif not self.child_nodes:
+                if not self.child_nodes:
+                    state = self.state
+                    state = torch.tensor(state, dtype = torch.float32)
+                    state = state.unsqueeze(0)
                     # model을 통해 policy와 value 얻음
-                    policies, value = self.predict(model, self.state)
+                    policies, value = self.predict(state)
 
                     self.w += value
                     self.n += 1
 
                     # expand child node
                     self.child_nodes = []
-                    legal_actions = self.mcts.legal_actions
+                    legal_actions = np.where(self.mcts.legal_actions != 0)
 
-                    for action, policy in zip(legal_actions, policies):
-                        self.mcts.env.present_state = self.state
-                        next_state, _, _, _ = self.mcts.env.step(action)
+                    for action, policy in zip(*legal_actions, *policies):
+                        self.env.present_state = copy.deepcopy(self.state)
+                        next_state, _, _, _ = self.env.step(action)
                         self.child_nodes.append(Node(self.mcts, next_state, policy))
 
                     return value
 
                 # end node가 아니고, child node가 있는 경우 => 전개
                 else:
-                    value = -self.next_child_node().evaluate()
+                    next_child_node = self.next_child_node()
+                    value = -next_child_node.evaluate()
 
                     self.w += value
                     self.n += 1
@@ -78,22 +83,25 @@ class Mcts:
                 PUCB에 따라 child node를 선택
                 '''
                 node_scores = list(map(lambda c: c.n, self.child_nodes))
+
                 scores = sum(node_scores)
                 # pucb 값에 따라 정렬한 child nodes list (마지막이 최댓값을 갖는 child node)
-                pucb_sorted = sorted(self.child_nodes, key = lambda c: (-c.x / c.n if c.n else 0.0) + C_PUCT * c.p * sqrt(scores) / (1 + c.n))
+                pucb_sorted = sorted(self.child_nodes, key = lambda c: (-c.w / c.n if c.n else 0.0) + C_PUCT * c.p * sqrt(scores) / (1 + c.n))
 
                 return pucb_sorted[-1]
 
 
-            def predict(self):
+            def predict(self, state):
                 '''
                 model을 통해 policy와 value 계산
                 '''
-                x = self.state # 차원 맞추기
+                x = state # 차원 맞추기
                 # x = x.unsqueeze(0) 아마도...
-                policies, value = model.forward(x)
+                policies, value = self.mcts.model.forward(x)
+                policies = policies.detach().numpy()
+                value = value.detach().numpy()
                 policies = policies * self.mcts.legal_actions # legal action에 대한 policy
-                policies /= sum(policies) if sum(policies) else 1 # 합계 1의 확률분포로 변환
+                policies /= np.sum(policies) if np.sum(policies) else 1 # 합계 1의 확률분포로 변환
 
                 return policies, value
 
@@ -107,10 +115,11 @@ class Mcts:
         '''
         root_node = self.Node(self, state, 0) # Mcts 객체 self 전달
 
-        for _ in range(EVAL_CNT):
+        for i in range(EVAL_CNT):
             root_node.evaluate()
 
         scores = [c.n for c in root_node.child_nodes]
+
         if self.temperature == 0: # 최대값인 경우에만 1로 지정
             action = np.argmax(scores)
             scores = np.zeros(len(scores))
@@ -134,7 +143,7 @@ class Mcts:
         '''
         MCTS를 통해 얻은 policy에 따른 action 선택
         '''
+        legal_actions = np.where(self.legal_actions != 0)[0]
         policy = self.get_policy(state)
-        action = np.random.choice(self.legal_actions, p=policy)
+        action = np.random.choice(legal_actions, p=policy)
         return policy, action
-
