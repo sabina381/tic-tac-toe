@@ -1,26 +1,26 @@
-# # import
-# import numpy as np
-# import copy
-# import pickle
+# import
+import numpy as np
+import copy
+import pickle
 
-# from ResNet import Net
-# from mcts import Mcts
-# from file_save_load import load_history, save_history
+from ResNet import Net
+from mcts import Mcts
+from file_save_load import load_history, save_history
 
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
 
-# from Environment import Environment
-# from Environment import State
+from Environment import Environment
+from Environment import State
 
-# # parameter
-# SP_GAME_COUNT = 500  # 셀프 플레이를 수행할 게임 수(오리지널: 25,000)
-# SP_TEMPERATURE = 1.0  # 볼츠만 분포의 온도 파라미터
+# parameter
+SP_GAME_COUNT = 500  # 셀프 플레이를 수행할 게임 수(오리지널: 25,000)
+SP_TEMPERATURE = 1.0  # 볼츠만 분포의 온도 파라미터
 
-# CONV_UNITS = 64
-# env = Environment()
-# state = State()
+CONV_UNITS = 64
+env = Environment()
+state = State()
 
 ##################################
 # 1번의 게임 play 함수

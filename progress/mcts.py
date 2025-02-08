@@ -1,23 +1,23 @@
-# # import
-# import copy
-# from math import sqrt
-# import numpy as np
-# import torch
+# import
+import copy
+from math import sqrt
+import numpy as np
+import torch
 
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
 
-# from Environment import State
-# from Environment import Environment
+from Environment import State
+from Environment import Environment
 
-# # parameter
-# C_PUCT = 1.0
-# EVAL_CNT = 50
-# TEMPERATURE = 1.0
+# parameter
+C_PUCT = 1.0
+EVAL_CNT = 50
+TEMPERATURE = 1.0
 
-# env = Environment()
-# state = State()
+env = Environment()
+state = State()
 
 ##################################
 def predict(state, model):

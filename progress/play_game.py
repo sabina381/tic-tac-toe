@@ -1,13 +1,13 @@
-# # import
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+# import
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
 
-# from Environment import Environment
-# from Environment import State
+from Environment import Environment
+from Environment import State
 
-# # parameter
-# env = Environment()
+# parameter
+env = Environment()
 
 
 # 1 game play하는 함수

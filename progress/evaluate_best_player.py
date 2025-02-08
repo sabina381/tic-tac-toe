@@ -1,23 +1,23 @@
-# # import
-# import torch
+# import
+import torch
 
-# from file_save_load import load_model
-# from mcts import Mcts
-# from enemy_agents import RandomAgent, AlphaBetaAgent, McsAgent, MctsAgent
-# from play_game import evaluate_algorithm
+from file_save_load import load_model
+from mcts import Mcts
+from enemy_agents import RandomAgent, AlphaBetaAgent, McsAgent, MctsAgent
+from play_game import evaluate_algorithm
 
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+import sys
+import os
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
 
-# from Environment import Environment
-# from Environment import State
+from Environment import Environment
+from Environment import State
 
-# # parameter
-# env = Environment()
-# EP_NUM_GAME = 10
-# file_name = "model1"
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# parameter
+env = Environment()
+EP_NUM_GAME = 10
+file_name = "model1"
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # best player를 평가하는 함수
 # 만약 새로운 모델이 best model로 업데이트 된 경우

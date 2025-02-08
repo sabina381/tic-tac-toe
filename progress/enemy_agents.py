@@ -1,22 +1,18 @@
-# # import
-# import numpy as np
-# import random
-# import math
+# import
+import numpy as np
+import random
+import math
 
-# import sys
-# import os
-# sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname('/Users/seungyeonlee/Documents/GitHub/24-2-TicTacToe'))))
+from Environment import Environment
 
-# from Environment import Environment
+# parameters
+env = Environment()
 
-# # parameters
-# env = Environment()
+AB_DEPTH = 100 # 알파베타 알고리즘
 
-# AB_DEPTH = 100 # 알파베타 알고리즘
+MCS_PO_NUM = 30 # MCS 알고리즘
 
-# MCS_PO_NUM = 30 # MCS 알고리즘
-
-# MCTS_EV_NUM = 100 # MCTS 알고리즘
+MCTS_EV_NUM = 100 # MCTS 알고리즘
 
 # random agent ################################
 class RandomAgent:
