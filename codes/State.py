@@ -1,5 +1,5 @@
+# import
 import numpy as np
-import random
 import copy
 
 from Environment import Environment
@@ -7,7 +7,7 @@ from Environment import Environment
 # parameter
 STATE_SIZE = (3, 3)
 
-# State
+# class
 class State(Environment):
     __slots__ = ('state', 'enemy_state')
 
@@ -20,7 +20,7 @@ class State(Environment):
         self.enemy_state = np.array(self.enemy_state).reshape(STATE_SIZE)
 
 
-    def _total_pieces_count(self):
+    def total_pieces_count(self):
         '''
         이 state의 전체 돌의 개수를 반환한다.
         '''
@@ -30,11 +30,20 @@ class State(Environment):
 
     def get_legal_actions(self):
         '''
+        이 state에서 가능한 action idx의 리스트를 반환한다.
+        '''
+        total_state = (self.state + self.enemy_state).reshape(-1)
+        legal_actions = np.where(total_state == 0)[0]
+        return legal_actions
+
+
+    def get_onehot_legal_actions(self):
+        '''
         이 state에서 가능한 action을
         one-hot encoding 형식의 array로 반환한다.
         '''
-        total_state = (self.state + self.enemy_state).reshape(-1)
-        legal_actions = np.array([total_state[x] == 0 for x in self.action_space], dtype = int)
+        legal_actions = self.get_legal_actions()
+        onehot_legal_actions = np.array([legal_actions[x] == 0 for x in self.action_space], dtype = int)
         return legal_actions
 
 
@@ -51,10 +60,10 @@ class State(Environment):
             is_done, is_lose = True, False
 
         # Check lose
-        lose_condition = np.concatenate([self.enemy_state.sum(axis=0), self.enemy_state.sum(axis=1), [self.enemy_state.trace], [np.fliplr(self.enemy_state).trace()]])
+        lose_condition = np.concatenate([self.enemy_state.sum(axis=0), self.enemy_state.sum(axis=1), [self.enemy_state.trace()], [np.fliplr(self.enemy_state).trace()]])
         if self.n in lose_condition:
             is_done, is_lose = True, True
-        
+
         return is_done, is_lose
 
 
@@ -85,14 +94,21 @@ class State(Environment):
         이 state에서 가능한 action 중 랜덤으로 action을 반환한다.
         '''
         legal_actions = self.get_legal_actions()
-        legal_action_idxs = np.where(legal_actions != 0)[0]
-        action = np.random.choice(legal_action_idxs)
+        action = np.random.choice(legal_actions)
         return action
 
 
-    def __str__(self):
+    def get_total_state(self):
+        '''
+        history에 넣을 전체 게임보드 state
+        자신의 수: 1 / 상대의 수: -1 / 빈칸: 0
+        '''
+        # return (self.state, self.enemy_state)
+        return self.state - self.enemy_state
+
+
+    def render(self):
         '''
         이 state를 렌더링한다.
         '''
         super().render(self)
-
