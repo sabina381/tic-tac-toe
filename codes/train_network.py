@@ -15,7 +15,7 @@ from config import *
 
 
 class TrainNetwork:
-    __slots__ = ('env', 'file_name', 'model_type', 'model', 'device', 'temp', 'optimizer', 'scheduler', 'cross_entropy', 'memory', 'policy_loss_list', 'value_loss_list', 'loss_list', 'step_list')
+    __slots__ = ('env', 'file_name', 'model_type', 'model', 'device', 'temp', 'optimizer', 'scheduler', 'cross_entropy', 'memory', 'loss_policy_list', 'loss_value_list', 'loss_list', 'step_list')
 
     def __init__(self, file_name, model_type):
         self.env = Environment(STATE_SIZE, WIN_CONDITION)
@@ -30,8 +30,8 @@ class TrainNetwork:
 
         self.memory = load_history(f'{file_name}_history.pkl')
 
-        self.policy_loss_list = []
-        self.value_loss_list = []
+        self.loss_policy_list = []
+        self.loss_value_list = []
         self.loss_list = []
         self.step_list = []
 
@@ -138,9 +138,10 @@ class TrainNetwork:
         y_policy = y[:, :-1]
         y_value = y[:, -1:]
 
-        mse = F.mse_loss(pred_policy, y_policy)
-        cross_entropy = self.cross_entropy(pred_value, y_value)
-        return mse, cross_entropy, mse + cross_entropy
+        loss_policy = self.cross_entropy(pred_policy, y_policy)
+        loss_value = F.mse_loss(pred_value, y_value)
+        loss_total = loss_value + loss_policy
+        return loss_policy, loss_value, loss_total
 
 
     def _make_dataset(self):
@@ -166,30 +167,30 @@ class TrainNetwork:
         최근 모델을 불러와서 학습하는 함수
         '''
         self.model = self.model.to(self.device)
-        policy_loss_list = []
-        value_loss_list = []
+        loss_policy_list = []
+        loss_value_list = []
         loss_list = []
         for i in range(TRAIN_EPOCHS):
             X, Y = self._make_dataset()
             pred_policy, pred_value = self.model.forward(X)
-            policy_loss, value_loss, loss = self._loss_function(pred_policy, pred_value, Y)
+            loss_policy, loss_value, loss = self._loss_function(pred_policy, pred_value, Y)
             # 역전파
             self.optimizer.zero_grad()
             loss.requires_grad_(True)
             loss.backward()
             self.optimizer.step()
 
-            policy_loss_list.append(policy_loss.item())
-            value_loss_list.append(value_loss.item())
+            loss_policy_list.append(loss_policy.item())
+            loss_value_list.append(loss_value.item())
             loss_list.append(loss.item())
 
             if (i+1) % PRINT_LOSS_FREQENCY == 0:
-                print(f">> train step {i+1}/{TRAIN_EPOCHS} p_loss:{round(np.mean(policy_loss_list), 5)}, v_loss:{round(np.mean(value_loss_list), 5)}")
+                print(f">> train step {i+1}/{TRAIN_EPOCHS} p_loss:{round(np.mean(loss_policy_list), 5)}, v_loss:{round(np.mean(loss_value_list), 5)}")
 
         # 최근 모델 저장
         save_model(f'{self.file_name}_model_latest.pkl', self.model.to('cpu'))
 
-        return policy_loss_list, value_loss_list, loss_list
+        return loss_policy_list, loss_value_list, loss_list
 
 
     def train_cycle(self, eval):
@@ -197,13 +198,13 @@ class TrainNetwork:
             print(f"- - - - Episode {i+1}/{EPISODES} - - - -")
             self.model = load_model(f'{self.file_name}_model_latest.pkl', self.model_type)
             self.save_self_play_history()
-            policy_loss_list, value_loss_list, loss_list = self.train_network()
-            self.policy_loss_list.extend(policy_loss_list)
-            self.value_loss_list.extend(value_loss_list)
+            loss_policy_list, loss_value_list, loss_list = self.train_network()
+            self.loss_policy_list.extend(loss_policy_list)
+            self.loss_value_list.extend(loss_value_list)
             self.loss_list.extend(loss_list)
-            print(f" << policy loss: {round(np.mean(self.policy_loss_list[-10:]), 5)} / value_loss: {round(np.mean(self.value_loss_list[-10:]), 5)} >>")
+            print(f" << policy loss: {round(np.mean(self.loss_policy_list[-10:]), 5)} / loss_value: {round(np.mean(self.loss_value_list[-10:]), 5)} >>")
 
-            df = pd.DataFrame([self.policy_loss_list, self.value_loss_list, self.loss_list])
+            df = pd.DataFrame([self.loss_policy_list, self.loss_value_list, self.loss_list])
             save_data(f"{self.file_name}_loss_data.pkl", df)
             save_data(f"{self.file_name}_step.pkl", self.step_list)
 

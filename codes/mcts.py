@@ -31,6 +31,7 @@ def predict(state, model):
 
     legal_actions = list(state.get_legal_actions())
     policies = policies[legal_actions] # legal action에 대한 policy
+    policies = np.exp(policies - np.max(policies)) # Softmax 적용
     policies /= np.sum(policies) if np.sum(policies) else 1 # 합계 1의 확률분포로 변환
 
     return policies, value
