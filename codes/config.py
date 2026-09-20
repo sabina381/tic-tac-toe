@@ -1,15 +1,19 @@
-import torch
+from easydict import EasyDict
 
-# from net import *
+import torch
+from pathlib import Path
+import os
 
 # Environment
 STATE_SIZE = (3, 3)
 WIN_CONDITION = 3
-F_PATH = "/Users/seungyeonlee/Documents/GitHub/tic-tac-toe/algorithm/train_files"
-F_NAME = "250218-3"
+
+PATH = Path(os.getcwd()).parent
+F_PATH = PATH / "experiments"
+F_NAME = "alpz_ttt_01"
 
 ALLOW_TRANSPOSE = True 
-DATA_AGUMENTATION = True # 데이터 증강
+DATA_AUGMENTATION = True # 데이터 증강
 
 REWARD_WIN = 1
 REWARD_LOSE = -1
@@ -35,7 +39,15 @@ STATE_DIM = 2 + NUM_HISTORY * 2 + int(PLAYER_INFO)
 CONV_UNITS = 64
 RESIDUAL_NUM = 8
 
-DEVICE = torch.device("mps")
+# device
+if torch.backends.mps.is_built():
+    DEVICE = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
+
+elif torch.backends.cuda.is_built():
+    DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+else:
+    DEVICE = torch.device("cpu")
 
 # mcts
 C_PUCT = 5
@@ -68,59 +80,59 @@ EVAL_FREQUENCY = 10
 PRINT_LOSS_FREQENCY = 10
 
 
-config = f'''
-# Environment
-STATE_SIZE = {STATE_SIZE}
-WIN_CONDITION = {WIN_CONDITION}
-F_PATH = {F_PATH}
-F_NAME = {F_NAME}
+CONFIG = EasyDict({
+    'STATE_SIZE' : STATE_SIZE,
+    'WIN_CONDITION' : WIN_CONDITION,
+    'PATH' : PATH,
+    'F_PATH' : F_PATH,
+    'F_NAME' : F_NAME,
 
-ALLOW_TRANSPOSE = {ALLOW_TRANSPOSE}
-DATA_AGUMENTATION = {DATA_AGUMENTATION}
+    'ALLOW_TRANSPOSE' : ALLOW_TRANSPOSE,
+    'DATA_AUGMENTATION' : DATA_AUGMENTATION,
 
-# state
-NUM_HISTORY = {NUM_HISTORY}
-PLAYER_INFO = {PLAYER_INFO}
+    # state
+    'NUM_HISTORY' : NUM_HISTORY,
+    'PLAYER_INFO' : PLAYER_INFO,
 
-# enemy agents
-AB_DEPTH = {AB_DEPTH}
-MCS_PO_NUM ={MCS_PO_NUM}
-MCTS_EV_NUM = {MCTS_EV_NUM}
+    # enemy agents
+    'AB_DEPTH' : AB_DEPTH,
+    'MCS_PO_NUM' : MCS_PO_NUM,
+    'MCTS_EV_NUM' : MCTS_EV_NUM,
 
-# net
-ACTION_SIZE = {ACTION_SIZE}
-STATE_DIM = {STATE_DIM}
+    # net
+    'ACTION_SIZE' : ACTION_SIZE,
+    'STATE_DIM' : STATE_DIM,
 
-CONV_UNITS = {CONV_UNITS}
-RESIDUAL_NUM = {RESIDUAL_NUM}
+    'CONV_UNITS' : CONV_UNITS,
+    'RESIDUAL_NUM' : RESIDUAL_NUM,
 
-DEVICE = {DEVICE}
+    'DEVICE' : DEVICE,
 
-# mcts
-C_PUCT = {C_PUCT}
-EVAL_CNT = {EVAL_CNT}
-TEMPERATURE = {TEMPERATURE}
-TEMPERATURE_DECAY = {TEMPERATURE_DECAY}
+    # mcts
+    'C_PUCT' : C_PUCT,
+    'EVAL_CNT' : EVAL_CNT,
+    'TEMPERATURE' : TEMPERATURE,
+    'TEMPERATURE_DECAY' : TEMPERATURE_DECAY,
 
-# train
-LEARN_RATE = {LEARN_RATE}
-GAMMA = {GAMMA}
-TOTAL_SP_NUM = {TOTAL_SP_NUM}
-SP_NUM_TRAIN = {SP_NUM_TRAIN}
-EXPLORE_REGULATION = {EXPLORE_REGULATION}
+    # train
+    'LEARN_RATE' : LEARN_RATE,
+    'GAMMA' : GAMMA,
+    'TOTAL_SP_NUM' : TOTAL_SP_NUM,
+    'SP_NUM_TRAIN' : SP_NUM_TRAIN,
+    'EXPLORE_REGULATION' : EXPLORE_REGULATION,
 
-CROSS_ENTROPY = {CROSS_ENTROPY}
+    'CROSS_ENTROPY' : CROSS_ENTROPY,
 
-BATCHSIZE = {BATCHSIZE}
-TRAIN_EPOCHS = {TRAIN_EPOCHS}
-MEM_SIZE = {MEM_SIZE}
+    'BATCHSIZE' : BATCHSIZE,
+    'TRAIN_EPOCHS' : TRAIN_EPOCHS,
+    'MEM_SIZE' : MEM_SIZE,
 
-EPISODES = {EPISODES}
+    'EPISODES' : EPISODES,
 
-# evaluation
-EVAL_NUM_GAME = {EVAL_NUM_GAME}
-TEST_NUM_GAME = {TEST_NUM_GAME}
-CRITERIA = {CRITERIA}
+    # evaluation
+    'EVAL_NUM_GAME' : EVAL_NUM_GAME,
+    'TEST_NUM_GAME' : TEST_NUM_GAME,
+    'CRITERIA' : CRITERIA,
 
-EVAL_FREQUENCY = {EVAL_FREQUENCY}
-'''
+    'EVAL_FREQUENCY' : EVAL_FREQUENCY,
+    })
