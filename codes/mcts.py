@@ -4,16 +4,14 @@ from math import sqrt
 import numpy as np
 import torch
 
-from environment import Environment
 from config import *
+from utils import env
 
 ##################################
 def predict(state, model):
     '''
     model을 통해 policy와 value 계산
     '''
-    env = Environment(STATE_SIZE, WIN_CONDITION)
-
     model = model.to(DEVICE)
     
     if PLAYER_INFO:
@@ -39,10 +37,9 @@ def predict(state, model):
 
 # define Node class ##################
 class Node:
-    __slots__ = ('env', 'model', 'state', 'p', 'n', 'w', 'child_nodes')
+    __slots__ = ('model', 'state', 'p', 'n', 'w', 'child_nodes')
 
     def __init__(self, state, p, model):
-        self.env = Environment(STATE_SIZE, WIN_CONDITION)
         self.model = model
         self.state = state
         self.p = p # policy
@@ -55,7 +52,7 @@ class Node:
 
         # 게임 종료 시 승패 여부에 따라 value 업데이트
         if is_done:
-            value = self.env.get_reward(self.state)
+            value = env.get_reward(self.state)
             self.w += value
             self.n += 1
             return value
@@ -74,7 +71,7 @@ class Node:
             legal_actions = state.get_legal_actions()
 
             for action, policy in zip(legal_actions, policies):
-                next_state, _, _ = self.env.step(state, action)
+                next_state, _, _ = env.step(state, action)
                 self.child_nodes.append(Node(next_state, policy, self.model))
 
             return value
@@ -114,7 +111,7 @@ class Mcts:
     __slots__ = ('model', 'temperature', 'Node', 'player')
 
     def __init__(self, model, temperature=TEMPERATURE):
-        self.model = model
+        self.model = model.to(DEVICE)
         self.temperature = temperature
         self.player = None
 

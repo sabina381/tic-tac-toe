@@ -12,13 +12,13 @@ from environment import *
 from net import *
 
 from config import *
+from utils import env
 
 
 class TrainNetwork:
-    __slots__ = ('env', 'file_name', 'model_type', 'model', 'device', 'temp', 'optimizer', 'scheduler', 'cross_entropy', 'memory', 'loss_policy_list', 'loss_value_list', 'loss_list', 'step_list')
+    __slots__ = ('file_name', 'model_type', 'model', 'device', 'temp', 'optimizer', 'scheduler', 'cross_entropy', 'memory', 'loss_policy_list', 'loss_value_list', 'loss_list', 'step_list')
 
     def __init__(self, file_name, model_type):
-        self.env = Environment(STATE_SIZE, WIN_CONDITION)
         self.file_name = file_name
         self.device = DEVICE
         self.temp = TEMPERATURE
@@ -61,12 +61,12 @@ class TrainNetwork:
             legal_actions = state.get_legal_actions() # 가능한 행동 (index)
 
             # 전체 행동에 대한 policy
-            policy = [0] * self.env.num_actions
+            policy = [0] * env.num_actions
             for action, p in zip(legal_actions, policies):
                 policy[action] = p
 
             if PLAYER_INFO:
-                player_arr = np.full(self.env.state_size, state.check_first_player()).reshape(1, self.env.n, self.env.n)
+                player_arr = np.full(env.state_size, state.check_first_player()).reshape(1, env.n, env.n)
                 state_arr = np.concatenate([state.history, player_arr], axis=0)
             else:
                 state_arr = np.array(state.history)
@@ -75,10 +75,10 @@ class TrainNetwork:
 
             # 가능한 행동 중 랜덤으로 선택해서 게임 진행
             action = mcts.get_action(state)
-            state, is_done, _ = self.env.step(state, action)
+            state, is_done, _ = env.step(state, action)
 
         # first player 기준의 reward로 바꾸기
-        reward = self.env.get_first_reward(state)
+        reward = env.get_first_reward(state)
 
         for i in range(len(history)):
             history[i][-1] = reward if i % 2 == 0 else -reward
@@ -108,11 +108,11 @@ class TrainNetwork:
         '''
         data = self._self_play()
 
-        if DATA_AGUMENTATION:
+        if DATA_AUGMENTATION:
             new_data = []
             for _, temp in enumerate(data):
                 board, policy, value = temp
-                policy_arr = np.array(policy).reshape(self.env.n, self.env.n)
+                policy_arr = np.array(policy).reshape(env.n, env.n)
 
                 new_data.append((board, policy, value))
                 new_data.append((np.transpose(board.copy(), (0, 2, 1)), policy_arr.copy().T.flatten(), value))

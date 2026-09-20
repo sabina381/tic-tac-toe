@@ -3,7 +3,7 @@ import numpy as np
 import random
 from math import log
 
-from environment import Environment
+from utils import env
 
 # parameters
 from config import *
@@ -20,15 +20,10 @@ class RandomAgent:
 
 
 # alpha-beta(minimax) agent ################################
-# parameter
-AB_DEPTH = 100
-
-# class
 class AlphaBetaAgent:
     __slots__ = ('player', 'best_action', 'root_node')
 
     def __init__(self, player:bool):
-        self.env = Environment(STATE_SIZE, WIN_CONDITION)
         self.player = player
         self.best_action = None
         self.root_node = None
@@ -49,7 +44,7 @@ class AlphaBetaAgent:
         legal_actions = present_state.get_legal_actions()
 
         if is_done or (depth == 0):
-            reward = self.env.get_reward(present_state)
+            reward = env.get_reward(present_state)
             return reward
 
         if present_state.check_first_player() == self.player: # max player
@@ -57,7 +52,7 @@ class AlphaBetaAgent:
 
             for action in legal_actions:
                 # state = copy.deepcopy(present_state)
-                next_state, _, _ = self.env.step(state, action)
+                next_state, _, _ = env.step(state, action)
 
                 eval = self.minimax(next_state, depth-1, alpha, beta)
 
@@ -78,7 +73,7 @@ class AlphaBetaAgent:
             min_eval = np.Inf
             for action in legal_actions:
                 # state = copy.deepcopy(present_state)
-                next_state, _, _ = self.env.step(state, action)
+                next_state, _, _ = env.step(state, action)
 
                 eval = self.minimax(next_state, depth-1, alpha, beta)
                 min_eval = min(min_eval, eval)
@@ -91,15 +86,10 @@ class AlphaBetaAgent:
 
 
 # MCS agent ################################
-# parameter
-MCS_PO_NUM = 30
-
-# class
 class McsAgent():
-    __slots__ = ('env', 'player')
+    __slots__ = ('player')
 
     def __init__(self, player:bool):
-        self.env = Environment(STATE_SIZE, WIN_CONDITION)
         self.player = player
 
     def get_action(self, state):
@@ -107,7 +97,7 @@ class McsAgent():
         value_list = np.zeros(len(legal_actions))
 
         for i, action in enumerate(legal_actions):
-            next_state, _, _ = self.env.step(state, action)
+            next_state, _, _ = env.step(state, action)
 
             for _ in range(MCS_PO_NUM):
                 value_list[i] += - self.playout(next_state)
@@ -120,10 +110,10 @@ class McsAgent():
         is_done, _ = state.check_done()
 
         if is_done:
-            return self.env.get_reward(state)
+            return env.get_reward(state)
 
         action = state.get_random_action()
-        next_state, _, _ = self.env.step(state, action)
+        next_state, _, _ = env.step(state, action)
 
         return - self.playout(next_state)
 
@@ -136,10 +126,9 @@ class McsAgent():
 # MCTS Agent ################################
 # define Node class ##################
 class PureNode:
-    __slots__ = ('env', 'state', 'n', 'w', 'child_nodes')
+    __slots__ = ('state', 'n', 'w', 'child_nodes')
 
     def __init__(self, state):
-        self.env = Environment(STATE_SIZE, WIN_CONDITION)
         self.state = state
         self.n = 0 # visit count
         self.w = 0 # cumulative sum of values
@@ -150,7 +139,7 @@ class PureNode:
 
         # 게임 종료 시 승패 여부에 따라 value 업데이트
         if is_done:
-            value = self.env.get_reward(self.state)
+            value = env.get_reward(self.state)
             self.w += value
             self.n += 1
             return value
@@ -187,7 +176,7 @@ class PureNode:
         self.child_nodes = []
 
         for action in legal_actions:
-            next_state, _, _ = self.env.step(self.state, action)
+            next_state, _, _ = env.step(self.state, action)
             self.child_nodes.append(PureNode(next_state))
 
 
@@ -218,10 +207,10 @@ class PureNode:
         is_done, _ = state.check_done()
 
         if is_done:
-            return self.env.get_reward(state)
+            return env.get_reward(state)
 
         action = state.get_random_action()
-        next_state, _, _ = self.env.step(state, action)
+        next_state, _, _ = env.step(state, action)
 
         return - self.playout(next_state)
 

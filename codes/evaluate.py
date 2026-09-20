@@ -1,10 +1,8 @@
 # import
-import torch
 import pandas as pd
 import pickle
 
 from file_save_load import *
-from environment import *
 from enemy_agents import *
 from mcts import *
 
@@ -12,13 +10,11 @@ from config import *
 
 
 class Evaluate:
-    __slots__ = ('env', 'file_name', 'result_list', 'model_type')
+    __slots__ = ('file_name', 'result_list', 'model_type')
 
     def __init__(self, file_name, model_type):
-        self.env = Environment(STATE_SIZE, WIN_CONDITION)
         self.file_name = file_name
-        # [label, point, win, draw, lose]
-        self.result_list = []
+        self.result_list = []   # [label, point, win, draw, lose]
         self.model_type = model_type
 
 
@@ -52,17 +48,17 @@ class Evaluate:
 
         print(" << Start Evaluation w/ best >>")
         # 대전
-        average_point, cnt_win, cnt_draw = self.env.evaluate_first_algorithm("Evaluate network", player_list, EVAL_NUM_GAME)
+        average_point, cnt_win, cnt_draw = env.evaluate_first_algorithm("Evaluate network", player_list, EVAL_NUM_GAME)
         self._save_game_result('latest vs. best', average_point, cnt_win, cnt_draw)
 
         # game image
-        _, data = self.env.play_one_game(player_list, is_save=True)
-        self.env.save_game_image(f"{self.file_name}_{episode}_best_black", data)
+        _, data = env.play_one_game(player_list, is_save=True)
+        env.save_game_image(f"{self.file_name}_{episode}_best_black", data)
 
         inverse_player_list = [None, None]
         inverse_player_list[0], inverse_player_list[1] = player_list[1], player_list[0]
-        _, data = self.env.play_one_game(inverse_player_list, is_save=True)
-        self.env.save_game_image(f"{self.file_name}_{episode}_best_white", data)
+        _, data = env.play_one_game(inverse_player_list, is_save=True)
+        env.save_game_image(f"{self.file_name}_{episode}_best_white", data)
 
         # best player 교체
         if average_point > CRITERIA:
@@ -86,14 +82,14 @@ class Evaluate:
             agent = agents_dict[key]
             player_list = [mcts_best, agent]
             count += 1
-            average_point, cnt_win, cnt_draw = self.env.evaluate_first_algorithm(f"[{count}/{len(agents_dict)}] vs. {key}", player_list, TEST_NUM_GAME)
+            average_point, cnt_win, cnt_draw = env.evaluate_first_algorithm(f"[{count}/{len(agents_dict)}] vs. {key}", player_list, TEST_NUM_GAME)
             self._save_game_result(key, average_point, cnt_win, cnt_draw)
 
             # game image
             _, data = self.env.play_one_game(player_list, is_save=True)
-            self.env.save_game_image(f"{self.file_name}_{episode}_{key}_black", data)
+            env.save_game_image(f"{self.file_name}_{episode}_{key}_black", data)
 
             inverse_player_list = [None, None]
             inverse_player_list[0], inverse_player_list[1] = player_list[1], player_list[0]
             _, data = self.env.play_one_game(inverse_player_list, is_save=True)
-            self.env.save_game_image(f"{self.file_name}_{episode}_{key}_white", data)
+            env.save_game_image(f"{self.file_name}_{episode}_{key}_white", data)
